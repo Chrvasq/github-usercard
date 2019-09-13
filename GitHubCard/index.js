@@ -84,8 +84,8 @@ function cardCreator(obj) {
 
   // add text and data to elements
   cardImage.src = obj.avatar_url;
-  nameHeader.textContent = obj.login;
-  userName.textContent = obj.name;
+  nameHeader.textContent = obj.name;
+  userName.textContent = obj.login;
   location.textContent = `Location: ${obj.location}`;
   profile.textContent = "Profile: ";
   profile.insertAdjacentHTML(
@@ -100,20 +100,25 @@ function cardCreator(obj) {
 }
 
 const cardsContainer = document.querySelector(".cards");
+
 axios
   .get("https://api.github.com/users/chrvasq")
   .then(response => {
     cardsContainer.appendChild(cardCreator(response.data));
+    axios
+      .get("https://api.github.com/users/chrvasq/followers")
+      .then(response => {
+        response.data.forEach(user => {
+          axios
+            .get(user.url)
+            .then(response => {
+              cardsContainer.appendChild(cardCreator(response.data));
+            })
+            .catch(error => console.log("Error", error));
+        });
+      })
+      .catch(error => console.log("Error", error));
   })
   .catch(error => {
     console.log("Error", error);
   });
-
-axios
-  .get("https://api.github.com/users/chrvasq/followers")
-  .then(response => {
-    response.data.forEach(user => {
-      cardsContainer.appendChild(cardCreator(user));
-    });
-  })
-  .catch(error => console.log("Error", error));
