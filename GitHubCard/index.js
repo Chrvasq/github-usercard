@@ -83,29 +83,37 @@ function cardCreator(obj) {
   });
 
   // add text and data to elements
-  cardImage.src = obj.data.avatar_url;
-  nameHeader.textContent = obj.data.login;
-  userName.textContent = obj.data.name;
-  location.textContent = `Location: ${obj.data.location}`;
+  cardImage.src = obj.avatar_url;
+  nameHeader.textContent = obj.login;
+  userName.textContent = obj.name;
+  location.textContent = `Location: ${obj.location}`;
   profile.textContent = "Profile: ";
   profile.insertAdjacentHTML(
     "beforeend",
-    `<a href=${obj.data.html_url}>${obj.data.html_url}</a>`
+    `<a href=${obj.html_url}>${obj.html_url}</a>`
   );
-  followers.textContent = `Followers: ${obj.data.followers}`;
-  following.textContent = `Following: ${obj.data.following}`;
-  bio.textContent = `Bio: ${obj.data.bio}`;
+  followers.textContent = `Followers: ${obj.followers}`;
+  following.textContent = `Following: ${obj.following}`;
+  bio.textContent = `Bio: ${obj.bio}`;
 
   return card;
 }
 
+const cardsContainer = document.querySelector(".cards");
 axios
   .get("https://api.github.com/users/chrvasq")
   .then(response => {
-    console.log(response.data);
-    document.querySelector(".cards").appendChild(cardCreator(response));
-    console.log(response.data.html_url);
+    cardsContainer.appendChild(cardCreator(response.data));
   })
   .catch(error => {
-    console.log("Error");
+    console.log("Error", error);
   });
+
+axios
+  .get("https://api.github.com/users/chrvasq/followers")
+  .then(response => {
+    response.data.forEach(user => {
+      cardsContainer.appendChild(cardCreator(user));
+    });
+  })
+  .catch(error => console.log("Error", error));
